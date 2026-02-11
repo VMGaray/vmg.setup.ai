@@ -35,17 +35,7 @@ export default function ProjectCard({
           {description}
         </p>
 
-        {/* Tecnologías */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {tech.map((item, index) => (
-            <span
-              key={index}
-              className="text-xs px-3 py-1 rounded-full bg-[#f0f0fe] text-[#7971AE] font-medium"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
+       
 
         {/* Botón */}
         {link && (
