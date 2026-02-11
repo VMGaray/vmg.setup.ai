@@ -51,7 +51,7 @@ export default function Header() {
             href="#sobre-mi" 
             className="text-slate-700 hover:text-[#71AE97] font-medium transition-colors duration-200"
           >
-            Sobre mí
+            Nosotros
           </Link>
           <Link 
             href="#contacto" 

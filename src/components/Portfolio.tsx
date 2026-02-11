@@ -11,7 +11,7 @@ export default function Portfolio() {
           className="text-4xl md:text-5xl font-extrabold text-center mb-16 leading-tight"
           style={{ color: '#7971AE' }}  // ← todo el título en violeta
         >
-          Algunos proyectos que he realizado
+          Algunos proyectos que hemos realizado
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

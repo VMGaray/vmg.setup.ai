@@ -29,7 +29,7 @@ export default function Footer() {
               </li>
               <li>
                 <a href="#sobre-mi" className="text-gray-300 hover:text-brand-green transition-colors text-sm">
-                  Sobre mí
+                  Nosotros
                 </a>
               </li>
               <li>
