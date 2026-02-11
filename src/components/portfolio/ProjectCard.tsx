@@ -1,4 +1,4 @@
-interface ProjectCardProps {
+export interface ProjectCardProps {
   title: string;
   description: string;
   tech: string[];
