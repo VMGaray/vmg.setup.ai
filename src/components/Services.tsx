@@ -67,7 +67,9 @@ export default function Services() {
           border-radius: 8px; background: rgba(255,255,255,0.02);
           transition: border-color 0.4s, background 0.4s;
           overflow: hidden;
+          cursor: default;
         }
+        .svc-card[href] { cursor: pointer; }
         .svc-card::before {
           content: ''; position: absolute; inset: 0;
           background: radial-gradient(circle at var(--cx,50%) var(--cy,50%), var(--acc,transparent), transparent 65%);
@@ -84,7 +86,7 @@ export default function Services() {
         .svc-card:hover .svc-feat { color: rgba(176,190,220,0.6); border-color: rgba(255,255,255,0.12); }
         .svc-cta {
           font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-          padding: 10px 22px; border-radius: 3px; text-decoration: none;
+          padding: 10px 0; border-radius: 3px; text-decoration: none;
           display: inline-flex; align-items: center; gap: 6px;
           transition: all 0.3s; margin-top: 24px;
         }
@@ -112,25 +114,23 @@ export default function Services() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
           {SERVICES.map((s, i) => {
-            const Wrapper = s.href ? Link : 'div';
-            return (
-              <Wrapper
-                key={s.num}
-                {...(s.href ? { href: s.href } : {})}
-                className="svc-card vmg-reveal"
-                style={{
-                  '--acc': s.accent + '10',
-                  transitionDelay: `${i * 0.12}s`,
-                  textDecoration: 'none',
-                  display: 'block',
-                } as React.CSSProperties}
-                onMouseMove={(e: React.MouseEvent<HTMLElement>) => {
-                  const r = e.currentTarget.getBoundingClientRect();
-                  e.currentTarget.style.setProperty('--cx', `${((e.clientX - r.left) / r.width) * 100}%`);
-                  e.currentTarget.style.setProperty('--cy', `${((e.clientY - r.top) / r.height) * 100}%`);
-                }}
-              >
-                {/* Number */}
+            const commonProps = {
+              className: "svc-card vmg-reveal",
+              style: {
+                '--acc': s.accent + '10',
+                transitionDelay: `${i * 0.12}s`,
+                textDecoration: 'none',
+                display: 'block',
+              } as React.CSSProperties,
+              onMouseMove: (e: React.MouseEvent<HTMLElement>) => {
+                const r = e.currentTarget.getBoundingClientRect();
+                e.currentTarget.style.setProperty('--cx', `${((e.clientX - r.left) / r.width) * 100}%`);
+                e.currentTarget.style.setProperty('--cy', `${((e.clientY - r.top) / r.height) * 100}%`);
+              }
+            };
+
+            const CardInner = (
+              <>
                 <div style={{
                   position: 'absolute', top: 24, right: 28,
                   fontFamily: "'Space Grotesk', sans-serif", fontSize: 56, fontWeight: 700,
@@ -139,7 +139,6 @@ export default function Services() {
                   {s.num}
                 </div>
 
-                {/* Accent line */}
                 <div style={{ width: 32, height: 2, background: s.accent, marginBottom: 28, borderRadius: 1 }} />
 
                 <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: s.accent, marginBottom: 10, opacity: 0.7 }}>
@@ -169,7 +168,17 @@ export default function Services() {
                     </svg>
                   </span>
                 )}
-              </Wrapper>
+              </>
+            );
+
+            return s.href ? (
+              <Link key={s.num} href={s.href} {...commonProps}>
+                {CardInner}
+              </Link>
+            ) : (
+              <div key={s.num} {...commonProps}>
+                {CardInner}
+              </div>
             );
           })}
         </div>
