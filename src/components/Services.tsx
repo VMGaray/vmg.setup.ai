@@ -45,6 +45,12 @@ export default function Services() {
     return () => obs.disconnect();
   }, []);
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--cx', `${((e.clientX - r.left) / r.width) * 100}%`);
+    e.currentTarget.style.setProperty('--cy', `${((e.clientY - r.top) / r.height) * 100}%`);
+  };
+
   return (
     <section
       id="servicios"
@@ -61,6 +67,7 @@ export default function Services() {
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@300;400&display=swap');
         .vmg-reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); }
         .vmg-reveal.vmg-visible { opacity: 1; transform: translateY(0); }
+        .svc-card-wrapper { text-decoration: none; display: block; outline: none; }
         .svc-card {
           position: relative; padding: 40px;
           border: 1px solid rgba(255,255,255,0.06);
@@ -68,14 +75,14 @@ export default function Services() {
           transition: border-color 0.4s, background 0.4s;
           overflow: hidden;
           cursor: default;
+          height: 100%;
         }
-        .svc-card[href] { cursor: pointer; }
+        .svc-card-wrapper:hover .svc-card { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); }
         .svc-card::before {
           content: ''; position: absolute; inset: 0;
           background: radial-gradient(circle at var(--cx,50%) var(--cy,50%), var(--acc,transparent), transparent 65%);
           opacity: 0; transition: opacity 0.4s; pointer-events: none;
         }
-        .svc-card:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); }
         .svc-card:hover::before { opacity: 1; }
         .svc-feat {
           font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
@@ -91,12 +98,6 @@ export default function Services() {
           transition: all 0.3s; margin-top: 24px;
         }
       `}</style>
-
-      <div style={{
-        position: 'absolute', top: '30%', left: '-5%', width: 500, height: 500,
-        background: 'radial-gradient(ellipse, rgba(0,210,150,0.05) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 40px' }}>
         <div className="vmg-reveal" style={{ marginBottom: 72 }}>
@@ -114,23 +115,15 @@ export default function Services() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
           {SERVICES.map((s, i) => {
-            const commonProps = {
-              className: "svc-card vmg-reveal",
-              style: {
-                '--acc': s.accent + '10',
-                transitionDelay: `${i * 0.12}s`,
-                textDecoration: 'none',
-                display: 'block',
-              } as React.CSSProperties,
-              onMouseMove: (e: React.MouseEvent<HTMLElement>) => {
-                const r = e.currentTarget.getBoundingClientRect();
-                e.currentTarget.style.setProperty('--cx', `${((e.clientX - r.left) / r.width) * 100}%`);
-                e.currentTarget.style.setProperty('--cy', `${((e.clientY - r.top) / r.height) * 100}%`);
-              }
-            };
-
-            const CardInner = (
-              <>
+            const cardContent = (
+              <div 
+                className="svc-card vmg-reveal"
+                onMouseMove={handleMouseMove}
+                style={{
+                  '--acc': s.accent + '10',
+                  transitionDelay: `${i * 0.12}s`,
+                } as React.CSSProperties}
+              >
                 <div style={{
                   position: 'absolute', top: 24, right: 28,
                   fontFamily: "'Space Grotesk', sans-serif", fontSize: 56, fontWeight: 700,
@@ -168,16 +161,16 @@ export default function Services() {
                     </svg>
                   </span>
                 )}
-              </>
+              </div>
             );
 
             return s.href ? (
-              <Link key={s.num} href={s.href} {...commonProps}>
-                {CardInner}
+              <Link key={s.num} href={s.href} className="svc-card-wrapper">
+                {cardContent}
               </Link>
             ) : (
-              <div key={s.num} {...commonProps}>
-                {CardInner}
+              <div key={s.num} className="svc-card-wrapper">
+                {cardContent}
               </div>
             );
           })}
