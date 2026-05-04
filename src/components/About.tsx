@@ -1,177 +1,160 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+
+const PILLARS = [
+  { icon: '⚡', title: 'Desarrollo Fullstack', desc: 'Frontend moderno y backend escalable' },
+  { icon: '🤖', title: 'Automatizaciones IA', desc: 'Integraciones y optimización de procesos' },
+  { icon: '🌎', title: 'Trabajo 100% remoto', desc: 'Alcance nacional e internacional' },
+  { icon: '📈', title: 'Enfoque en resultados', desc: 'Soluciones pensadas para crecer' },
+  { icon: '🧠', title: 'Tecnología moderna', desc: 'Stack actualizado y buenas prácticas' },
+  { icon: '🤝', title: 'Comunicación clara', desc: 'Compromiso en cada etapa del proyecto' },
+];
+
 export default function About() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vmg-visible'); }),
+      { threshold: 0.1 }
+    );
+    sectionRef.current?.querySelectorAll('.vmg-reveal').forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+
   return (
     <section
       id="sobre-mi"
-      className="py-20 md:py-28"
-      style={{ backgroundColor: '#f0f0fe' }}
+      ref={sectionRef}
+      style={{
+        background: '#0d1425',
+        padding: '120px 0',
+        fontFamily: "'DM Sans', sans-serif",
+        position: 'relative',
+        overflow: 'hidden',
+      }}
     >
-      <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-        {/* Título */}
-        <h2
-          className="text-4xl md:text-5xl font-extrabold text-center mb-16 leading-tight"
-          style={{ color: '#AE7188' }}
-        >
-          Sobre <span style={{ color: '#AE7188' }}>nosotros</span>
-        </h2>
+      <style>{`
+        .vmg-reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); }
+        .vmg-reveal.vmg-visible { opacity: 1; transform: translateY(0); }
+        .pillar-card {
+          padding: 20px 24px;
+          border: 1px solid rgba(255,255,255,0.05);
+          border-radius: 6px; background: rgba(255,255,255,0.02);
+          display: flex; align-items: flex-start; gap: 14px;
+          transition: all 0.3s;
+        }
+        .pillar-card:hover { border-color: rgba(0,210,150,0.15); background: rgba(0,210,150,0.03); }
+      `}</style>
 
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Columna izquierda: Texto principal */}
-          <div className="space-y-6">
-            <div>
-              <h3
-                className="text-2xl md:text-3xl font-bold mb-4"
-                style={{ color: '#71AE97' }}
-              >
-                Somos VMG Setup AI
-              </h3>
-              <p className="text-gray-700 text-lg leading-relaxed">
+      <div style={{
+        position: 'absolute', top: '50%', right: '-5%', width: 500, height: 500,
+        background: 'radial-gradient(ellipse, rgba(99,102,241,0.05) 0%, transparent 70%)',
+        transform: 'translateY(-50%)', pointerEvents: 'none',
+      }} />
+
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start' }}>
+
+          {/* Left */}
+          <div>
+            <div className="vmg-reveal">
+              <div style={{ fontSize: 11, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(0,210,150,0.5)', marginBottom: 16 }}>
+                Nosotros
+              </div>
+              <h2 style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: 'clamp(32px,4vw,52px)', fontWeight: 700,
+                color: '#f0f4ff', lineHeight: 1.1, marginBottom: 32,
+              }}>
+                Somos VMG<br />
+                <span style={{ color: '#00d296' }}>Setup AI</span>
+              </h2>
+            </div>
+
+            <div className="vmg-reveal" style={{ transitionDelay: '0.1s' }}>
+              <p style={{ fontSize: 15, color: 'rgba(176,190,220,0.6)', lineHeight: 1.8, fontWeight: 300, marginBottom: 20 }}>
                 Somos un equipo especializado en{' '}
-                <strong>
-                  desarrollo fullstack, soluciones frontend y automatizaciones
-                  inteligentes
-                </strong>
-                . Diseñamos y construimos herramientas digitales pensadas para
-                optimizar procesos, mejorar la presencia online y potenciar
-                negocios.
+                <span style={{ color: '#f0f4ff' }}>desarrollo fullstack, soluciones frontend y automatizaciones inteligentes</span>.
+                Diseñamos y construimos herramientas digitales pensadas para optimizar procesos,
+                mejorar la presencia online y potenciar negocios.
+              </p>
+              <p style={{ fontSize: 15, color: 'rgba(176,190,220,0.6)', lineHeight: 1.8, fontWeight: 300, marginBottom: 20 }}>
+                Trabajamos de manera <span style={{ color: '#f0f4ff' }}>100% remota</span>, brindando soluciones a
+                emprendedores, comercios y empresas de Argentina y el exterior.
+              </p>
+              <p style={{ fontSize: 15, color: 'rgba(176,190,220,0.6)', lineHeight: 1.8, fontWeight: 300 }}>
+                Cada proyecto es único. Analizamos las necesidades específicas de cada cliente para
+                desarrollar soluciones a medida, escalables y orientadas a resultados.
               </p>
             </div>
 
-            <div>
-              <h4
-                className="text-xl font-bold mb-3"
-                style={{ color: '#AE7188' }}
+            {/* CTA */}
+            <div className="vmg-reveal" style={{ transitionDelay: '0.2s', marginTop: 40 }}>
+              <a
+                href="https://wa.me/5491145311047?text=Hola!%20Quiero%20consultar%20sobre%20sus%20servicios"
+                target="_blank" rel="noopener noreferrer"
+                style={{
+                  fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase',
+                  padding: '12px 28px', border: '1px solid rgba(0,210,150,0.3)',
+                  color: 'rgba(0,210,150,0.7)', textDecoration: 'none', borderRadius: 3,
+                  display: 'inline-block', transition: 'all 0.3s',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(0,210,150,0.08)';
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(0,210,150,0.6)';
+                  (e.currentTarget as HTMLAnchorElement).style.color = '#00d296';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = 'transparent';
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(0,210,150,0.3)';
+                  (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(0,210,150,0.7)';
+                }}
               >
-                Alcance nacional e internacional
-              </h4>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                Trabajamos de manera 100% remota, brindando soluciones digitales
-                a emprendedores, comercios y empresas de distintos puntos del
-                país y del exterior. Nuestro enfoque combina tecnología moderna,
-                diseño estratégico y visión de crecimiento.
-              </p>
-            </div>
-
-            <div>
-              <h4
-                className="text-xl font-bold mb-3"
-                style={{ color: '#A7AE71' }}
-              >
-                Nuestra metodología
-              </h4>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                Creemos que cada proyecto es único. Analizamos las necesidades
-                específicas de cada cliente para desarrollar soluciones a
-                medida, escalables y orientadas a resultados. Priorizamos la
-                comunicación clara, la organización y el compromiso en cada
-                etapa del proceso.
-              </p>
+                Hablemos por WhatsApp →
+              </a>
             </div>
           </div>
 
-          {/* Columna derecha: Características */}
+          {/* Right — pillars grid */}
           <div>
-            <div className="p-8 rounded-2xl shadow-md bg-[#ecdde3] border border-[#dfc6cf]/30 hover:shadow-xl transition-all duration-300">
-              <h4
-                className="text-2xl font-bold mb-6 text-center"
-                style={{ color: '#7971AE' }}
-              >
-                En pocas palabras
-              </h4>
-
-              <div className="space-y-4">
-                {/* Desarrollo */}
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">💻</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {PILLARS.map((p, i) => (
+                <div
+                  key={p.title}
+                  className="pillar-card vmg-reveal"
+                  style={{ transitionDelay: `${0.1 + i * 0.07}s` }}
+                >
+                  <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1.4 }}>{p.icon}</span>
                   <div>
-                    <p className="font-bold text-gray-800 text-lg">
-                      Desarrollo Fullstack
-                    </p>
-                    <p className="text-gray-700">
-                      Frontend moderno y backend escalable
-                    </p>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: '#f0f4ff', marginBottom: 3 }}>{p.title}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(176,190,220,0.4)', lineHeight: 1.5 }}>{p.desc}</div>
                   </div>
                 </div>
-
-                {/* Automatizaciones */}
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">⚙️</span>
-                  <div>
-                    <p className="font-bold text-gray-800 text-lg">
-                      Automatizaciones inteligentes
-                    </p>
-                    <p className="text-gray-700">
-                      Integraciones y optimización de procesos
-                    </p>
-                  </div>
-                </div>
-
-                {/* Alcance */}
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">🌎</span>
-                  <div>
-                    <p className="font-bold text-gray-800 text-lg">
-                      Trabajo remoto
-                    </p>
-                    <p className="text-gray-700">
-                      Alcance nacional e internacional
-                    </p>
-                  </div>
-                </div>
-
-                {/* Resultados */}
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">📈</span>
-                  <div>
-                    <p className="font-bold text-gray-800 text-lg">
-                      Enfoque en resultados
-                    </p>
-                    <p className="text-gray-700">
-                      Soluciones pensadas para crecer
-                    </p>
-                  </div>
-                </div>
-
-                {/* Tecnología */}
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">🧠</span>
-                  <div>
-                    <p className="font-bold text-gray-800 text-lg">
-                      Tecnología actual
-                    </p>
-                    <p className="text-gray-700">
-                      Stack moderno y herramientas innovadoras
-                    </p>
-                  </div>
-                </div>
-
-                {/* Valores */}
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">🎯</span>
-                  <div>
-                    <p className="font-bold text-gray-800 text-lg">
-                      Compromiso y profesionalismo
-                    </p>
-                    <p className="text-gray-700">
-                      Planificación, organización y calidad
-                    </p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* Call to action */}
-            <div className="mt-6 text-center">
-              <a
-                href="#contacto"
-                className="inline-block px-8 py-4 rounded-xl text-lg font-bold shadow-lg transition-all hover:shadow-xl hover:-translate-y-1"
-                style={{ backgroundColor: '#A7AE71', color: 'white' }}
-              >
-                Iniciar proyecto →
-              </a>
+            {/* Location badge */}
+            <div className="vmg-reveal" style={{
+              transitionDelay: '0.5s', marginTop: 16,
+              padding: '16px 20px',
+              border: '1px solid rgba(255,255,255,0.05)',
+              borderRadius: 6, background: 'rgba(255,255,255,0.02)',
+              display: 'flex', alignItems: 'center', gap: 12,
+            }}>
+              <span style={{ fontSize: 18 }}>📍</span>
+              <div>
+                <div style={{ fontSize: 13, color: '#f0f4ff', fontWeight: 500 }}>Villa General Belgrano, Córdoba</div>
+                <div style={{ fontSize: 12, color: 'rgba(176,190,220,0.4)', marginTop: 2 }}>Argentina · Trabajamos con clientes de todo el mundo</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Mobile responsive */}
+      <style>{`@media(max-width:768px){#sobre-mi .vmg-grid{grid-template-columns:1fr!important;gap:48px!important}}`}</style>
     </section>
   );
 }

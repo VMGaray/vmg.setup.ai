@@ -1,63 +1,229 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
 export default function Hero() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => setVisible(true), 100);
+    const canvas = canvasRef.current;
+    const hero = heroRef.current;
+    if (!canvas || !hero) return;
+    const ctx = canvas.getContext('2d')!;
+    let W = 0, H = 0, animId = 0;
+    type P = { x:number;y:number;vx:number;vy:number;size:number;opacity:number;pulse:number;z:number };
+    let pts: P[] = [];
+
+    function resize() {
+      W = canvas!.width = hero!.offsetWidth;
+      H = canvas!.height = hero!.offsetHeight;
+      pts = Array.from({ length: Math.floor(W * H / 14000) }, () => ({
+        x: Math.random()*W, y: Math.random()*H,
+        vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3,
+        size: Math.random()*1.2+0.3, opacity: Math.random()*0.4+0.1,
+        pulse: Math.random()*Math.PI*2, z: Math.random()*2+0.5,
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0,0,W,H);
+      const mx = mouseRef.current.x, my = mouseRef.current.y;
+      pts.forEach((p,i) => {
+        p.pulse += 0.015; p.x += p.vx; p.y += p.vy;
+        if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+        const px = p.x+(mx-W/2)*0.008*p.z;
+        const py = p.y+(my-H/2)*0.008*p.z;
+        const op = p.opacity*(0.7+0.3*Math.sin(p.pulse));
+        ctx.beginPath(); ctx.arc(px,py,p.size*p.z,0,Math.PI*2);
+        ctx.fillStyle=`rgba(0,210,150,${op})`; ctx.fill();
+        for(let j=i+1;j<pts.length;j++){
+          const p2=pts[j];
+          const p2x=p2.x+(mx-W/2)*0.008*p2.z, p2y=p2.y+(my-H/2)*0.008*p2.z;
+          const d=Math.hypot(px-p2x,py-p2y);
+          if(d<100){
+            ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(p2x,p2y);
+            ctx.strokeStyle=`rgba(0,210,150,${(1-d/100)*0.06})`; ctx.lineWidth=0.5; ctx.stroke();
+          }
+        }
+      });
+      animId = requestAnimationFrame(draw);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    animId = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize); };
+  }, []);
+
   return (
-    <section 
-      className="relative py-20 md:py-28"
-      style={{ 
-        backgroundColor: '#f0f0fe',
-        paddingTop: '200px'  // espacio para header
+    <section
+      ref={heroRef}
+      onMouseMove={e => {
+        const r = heroRef.current!.getBoundingClientRect();
+        mouseRef.current = { x: e.clientX-r.left, y: e.clientY-r.top };
+      }}
+      style={{
+        position: 'relative', minHeight: '100vh', background: '#0d1425',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        overflow: 'hidden', fontFamily: "'DM Sans', sans-serif",
+        // Padding top = altura del header (64px) + espacio respiro
+        paddingTop: 64,
       }}
     >
-      <div className="container mx-auto px-6 max-w-3xl text-center">
-        {/* Título multicolor */}
-        <h1 
-          className="font-extrabold mb-8 leading-tight"
-          style={{ 
-            fontSize: 'clamp(2.2rem, 7vw, 4rem)',
-            lineHeight: '1.1'
-          }}
-        >
-          <span style={{ color: '#71AE97' }}>Tu </span>
-          <span style={{ color: '#7971AE' }}>aliado </span>
-          <span style={{ color: '#AE7188' }}>para </span>
-          <span style={{ color: '#A7AE71' }}>crecer </span>
-          <span style={{ color: '#71AE97' }}>en </span>
-          <span style={{ color: '#7971AE' }}>lo digital</span>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=DM+Sans:wght@300;400&display=swap');
+        .vmg-btn-p {
+          position:relative;overflow:hidden;font-size:13px;letter-spacing:0.12em;
+          text-transform:uppercase;padding:14px 32px;background:#00d296;color:#0d1425;
+          font-weight:600;text-decoration:none;border-radius:3px;transition:color 0.3s;display:inline-block;
+        }
+        .vmg-btn-p::after{content:'';position:absolute;inset:0;background:#0d1425;
+          transform:translateX(-101%);transition:transform 0.35s cubic-bezier(0.76,0,0.24,1);z-index:0;}
+        .vmg-btn-p:hover::after{transform:translateX(0);}
+        .vmg-btn-p:hover{color:#00d296;}
+        .vmg-btn-p span{position:relative;z-index:1;}
+        .vmg-btn-g {
+          font-size:13px;letter-spacing:0.12em;text-transform:uppercase;
+          padding:14px 32px;border:1px solid rgba(0,210,150,0.3);
+          color:rgba(0,210,150,0.6);text-decoration:none;border-radius:3px;
+          transition:all 0.3s;display:inline-block;
+        }
+        .vmg-btn-g:hover{border-color:rgba(0,210,150,0.7);color:#00d296;background:rgba(0,210,150,0.05);}
+        @keyframes dot-pulse{0%,100%{opacity:1;box-shadow:0 0 8px rgba(0,210,150,0.8)}50%{opacity:0.4;box-shadow:none}}
+        @keyframes scroll-line{0%{transform:translateY(-100%)}50%{transform:translateY(0)}100%{transform:translateY(100%)}}
+      `}</style>
+
+      <canvas ref={canvasRef} style={{position:'absolute',inset:0,pointerEvents:'none'}} />
+
+      <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',opacity:0.02,pointerEvents:'none'}}>
+        <defs><pattern id="vg" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M60 0L0 0 0 60" fill="none" stroke="white" strokeWidth="0.5"/>
+        </pattern></defs>
+        <rect width="100%" height="100%" fill="url(#vg)"/>
+      </svg>
+
+      <div style={{position:'absolute',top:'40%',left:'50%',width:700,height:500,
+        background:'radial-gradient(ellipse,rgba(0,210,150,0.08) 0%,transparent 70%)',
+        transform:'translate(-50%,-50%)',pointerEvents:'none'}}/>
+      <div style={{position:'absolute',top:'65%',right:'8%',width:400,height:400,
+        background:'radial-gradient(ellipse,rgba(99,102,241,0.06) 0%,transparent 70%)',
+        pointerEvents:'none'}}/>
+
+      {/* Todo el contenido en flujo normal — sin posición absoluta */}
+      <div style={{
+        maxWidth:860, padding:'60px 40px 80px',
+        textAlign:'center', position:'relative', zIndex:10,
+        display:'flex', flexDirection:'column', alignItems:'center', gap:0,
+      }}>
+        {/* Badge — inline en el flujo */}
+        <div style={{
+          display:'inline-flex', alignItems:'center', gap:8,
+          padding:'6px 16px', border:'1px solid rgba(0,210,150,0.2)',
+          borderRadius:20, background:'rgba(0,210,150,0.05)',
+          marginBottom:28,
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'none' : 'translateY(10px)',
+          transition:'all 0.7s ease 0.2s',
+        }}>
+          <div style={{width:6,height:6,borderRadius:'50%',background:'#00d296',animation:'dot-pulse 2s infinite'}}/>
+          <span style={{fontSize:11,letterSpacing:'0.15em',textTransform:'uppercase',color:'rgba(0,210,150,0.7)'}}>
+            Disponibles para nuevos proyectos
+          </span>
+        </div>
+
+        {/* Tag */}
+        <div style={{
+          fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase',
+          color:'rgba(0,210,150,0.4)', marginBottom:20,
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'none' : 'translateY(10px)',
+          transition:'all 0.7s ease 0.3s',
+        }}>
+          Desarrollo web · Automatización · IA
+        </div>
+
+        {/* H1 */}
+        <h1 style={{
+          fontFamily:"'Space Grotesk', sans-serif",
+          fontSize:'clamp(38px,6.5vw,78px)', fontWeight:700,
+          lineHeight:1.08, color:'#f0f4ff', marginBottom:24,
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'none' : 'translateY(24px)',
+          transition:'all 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s',
+        }}>
+          Tu negocio,{' '}
+          <span style={{color:'#00d296'}}>potenciado</span>{' '}
+          con tecnología
         </h1>
 
-        {/* Descripción */}
-        <p 
-          className="max-w-4xl mx-auto mb-12 leading-relaxed font-medium"
-          style={{ 
-            fontSize: 'clamp(0.95rem, 2.8vw, 1.125rem)',
-            color: '#444444'
-          }}
-        >
-          <span style={{ color: '#71AE97' }}>Páginas web</span> que venden,{' '}
-          <span style={{ color: '#AE7188' }}>tiendas online</span> que funcionan y{' '}
-          <span style={{ color: '#7971AE' }}>sistemas</span> que te ahorran tiempo.{' '}
-          <span style={{ color: '#A7AE71' }}>Todo hecho a medida</span> para emprendedores, comercios y profesionales como vos.
+        {/* Desc */}
+        <p style={{
+          fontSize:'clamp(15px,1.7vw,17px)', color:'rgba(176,190,220,0.6)',
+          lineHeight:1.8, fontWeight:300, maxWidth:560, marginBottom:40,
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'none' : 'translateY(16px)',
+          transition:'all 0.8s ease 0.55s',
+        }}>
+          Páginas web que convierten, tiendas online que venden y automatizaciones
+          que te ahorran tiempo. Todo hecho a medida para emprendedores y negocios.
         </p>
 
-        {/* Botones */}
-        <div className="flex flex-col sm:flex-row justify-center gap-6">
+        {/* CTAs */}
+        <div style={{
+          display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap',
+          marginBottom:72,
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'none' : 'translateY(12px)',
+          transition:'all 0.8s ease 0.7s',
+        }}>
           <a
             href="https://wa.me/5491145311047?text=Hola!%20Quiero%20consultar%20por%20mi%20sitio%20web"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block px-10 py-5 rounded-xl text-xl font-bold shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl"
-            style={{ backgroundColor: '#71AE97', color: 'white' }}
+            target="_blank" rel="noopener noreferrer"
+            className="vmg-btn-p"
           >
-            Quiero mi sitio web →
+            <span>Quiero mi sitio web →</span>
           </a>
-
-          <a
-            href="#servicios"
-            className="inline-block px-10 py-5 rounded-xl text-xl font-bold border-2 transition-all hover:-translate-y-1 hover:shadow-2xl"
-            style={{ borderColor: '#7971AE', color: '#7971AE' }}
-          >
+          <a href="#servicios" className="vmg-btn-g"
+            onClick={e=>{ e.preventDefault(); document.getElementById('servicios')?.scrollIntoView({behavior:'smooth'}); }}>
             Ver servicios
           </a>
         </div>
+
+        {/* Stats */}
+        <div style={{
+          display:'flex', gap:48, justifyContent:'center', flexWrap:'wrap',
+          paddingTop:40, borderTop:'1px solid rgba(255,255,255,0.05)',
+          width:'100%',
+          opacity: visible ? 1 : 0,
+          transition:'opacity 1s ease 1s',
+        }}>
+          {[
+            {n:'10+', label:'proyectos entregados'},
+            {n:'100%', label:'trabajo remoto'},
+            {n:'AR · ES', label:'alcance internacional'},
+          ].map(s=>(
+            <div key={s.label} style={{textAlign:'center'}}>
+              <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:26,fontWeight:700,color:'#00d296'}}>{s.n}</div>
+              <div style={{fontSize:11,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(176,190,220,0.35)',marginTop:4}}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Scroll hint */}
+      <div style={{
+        position:'absolute', bottom:28, left:'50%', transform:'translateX(-50%)',
+        display:'flex', flexDirection:'column', alignItems:'center', gap:8,
+        fontSize:10, letterSpacing:'0.2em', textTransform:'uppercase', color:'rgba(0,210,150,0.2)',
+      }}>
+        <div style={{width:1,height:36,background:'rgba(0,210,150,0.12)',position:'relative',overflow:'hidden'}}>
+          <div style={{position:'absolute',inset:0,background:'#00d296',animation:'scroll-line 2s ease-in-out infinite'}}/>
+        </div>
+        Scroll
       </div>
     </section>
   );
