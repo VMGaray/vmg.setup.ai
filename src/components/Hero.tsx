@@ -15,38 +15,89 @@ export default function Hero() {
     if (!canvas || !hero) return;
     const ctx = canvas.getContext('2d')!;
     let W = 0, H = 0, animId = 0;
-    type P = { x:number;y:number;vx:number;vy:number;size:number;opacity:number;pulse:number;z:number };
+    
+    // Agregamos propiedades para simular el "flujo de datos"
+    type P = { 
+      x: number; 
+      y: number; 
+      vx: number; 
+      vy: number; 
+      size: number; 
+      opacity: number; 
+      pulse: number; 
+      z: number;
+      char: string; // Algunos puntos mostrarán "bits" de datos
+    };
     let pts: P[] = [];
 
+    const chars = "01";
+
     function resize() {
-      W = canvas!.width = hero!.offsetWidth;
-      H = canvas!.height = hero!.offsetHeight;
-      pts = Array.from({ length: Math.floor(W * H / 14000) }, () => ({
-        x: Math.random()*W, y: Math.random()*H,
-        vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3,
-        size: Math.random()*1.2+0.3, opacity: Math.random()*0.4+0.1,
-        pulse: Math.random()*Math.PI*2, z: Math.random()*2+0.5,
+      if (!canvas || !hero) return;
+      W = canvas.width = hero.offsetWidth;
+      H = canvas.height = hero.offsetHeight;
+      // Ajustamos densidad de partículas
+      pts = Array.from({ length: Math.floor(W * H / 8000) }, () => ({
+        x: Math.random() * W, 
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.2, 
+        // Movimiento ascendente constante para simular flujo
+        vy: -0.2 - Math.random() * 0.5, 
+        size: Math.random() * 2 + 0.8, 
+        opacity: Math.random() * 0.5 + 0.1,
+        pulse: Math.random() * Math.PI * 2, 
+        z: Math.random() * 2 + 0.5,
+        char: chars.charAt(Math.floor(Math.random() * chars.length))
       }));
     }
 
     function draw() {
-      ctx.clearRect(0,0,W,H);
+      ctx.clearRect(0, 0, W, H);
       const mx = mouseRef.current.x, my = mouseRef.current.y;
-      pts.forEach((p,i) => {
-        p.pulse += 0.015; p.x += p.vx; p.y += p.vy;
-        if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
-        const px = p.x+(mx-W/2)*0.008*p.z;
-        const py = p.y+(my-H/2)*0.008*p.z;
-        const op = p.opacity*(0.7+0.3*Math.sin(p.pulse));
-        ctx.beginPath(); ctx.arc(px,py,p.size*p.z,0,Math.PI*2);
-        ctx.fillStyle=`rgba(0,210,150,${op})`; ctx.fill();
-        for(let j=i+1;j<pts.length;j++){
-          const p2=pts[j];
-          const p2x=p2.x+(mx-W/2)*0.008*p2.z, p2y=p2.y+(my-H/2)*0.008*p2.z;
-          const d=Math.hypot(px-p2x,py-p2y);
-          if(d<100){
-            ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(p2x,p2y);
-            ctx.strokeStyle=`rgba(0,210,150,${(1-d/100)*0.06})`; ctx.lineWidth=0.5; ctx.stroke();
+      
+      pts.forEach((p, i) => {
+        p.pulse += 0.02; 
+        p.x += p.vx; 
+        p.y += p.vy;
+
+        // Reposicionar al llegar arriba o salir de los bordes
+        if (p.y < -20) p.y = H + 20;
+        if (p.x < -20) p.x = W + 20;
+        if (p.x > W + 20) p.x = -20;
+
+        // Efecto Parallax con el mouse
+        const px = p.x + (mx - W / 2) * 0.01 * p.z;
+        const py = p.y + (my - H / 2) * 0.01 * p.z;
+        const op = p.opacity * (0.6 + 0.4 * Math.sin(p.pulse));
+
+        // Dibujar partícula (Punto de luz)
+        ctx.beginPath(); 
+        ctx.arc(px, py, p.size * p.z, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 210, 150, ${op})`; 
+        ctx.fill();
+
+        // Ocasionalmente dibujar un 'bit' de código cerca del punto
+        if (i % 10 === 0 && op > 0.3) {
+          ctx.font = `${8 * p.z}px monospace`;
+          ctx.fillStyle = `rgba(0, 210, 150, ${op * 0.3})`;
+          ctx.fillText(p.char, px + 10, py);
+        }
+
+        // Dibujar conexiones (Neural Network)
+        for (let j = i + 1; j < pts.length; j++) {
+          const p2 = pts[j];
+          const p2x = p2.x + (mx - W / 2) * 0.01 * p2.z;
+          const p2y = p2.y + (my - H / 2) * 0.01 * p2.z;
+          
+          const d = Math.hypot(px - p2x, py - p2y);
+          if (d < 110) { // Radio de conexión
+            ctx.beginPath(); 
+            ctx.moveTo(px, py); 
+            ctx.lineTo(p2x, p2y);
+            // La línea es más fuerte cuanto más cerca estén
+            ctx.strokeStyle = `rgba(0, 210, 150, ${(1 - d / 110) * 0.15})`; 
+            ctx.lineWidth = 0.6 * p.z; 
+            ctx.stroke();
           }
         }
       });
@@ -56,21 +107,25 @@ export default function Hero() {
     resize();
     window.addEventListener('resize', resize);
     animId = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize); };
+    return () => { 
+      cancelAnimationFrame(animId); 
+      window.removeEventListener('resize', resize); 
+    };
   }, []);
 
   return (
     <section
       ref={heroRef}
       onMouseMove={e => {
-        const r = heroRef.current!.getBoundingClientRect();
-        mouseRef.current = { x: e.clientX-r.left, y: e.clientY-r.top };
+        const r = heroRef.current?.getBoundingClientRect();
+        if (r) {
+          mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+        }
       }}
       style={{
         position: 'relative', minHeight: '100vh', background: '#0d1425',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         overflow: 'hidden', fontFamily: "'DM Sans', sans-serif",
-        // Padding top = altura del header (64px) + espacio respiro
         paddingTop: 64,
       }}
     >
@@ -97,8 +152,10 @@ export default function Hero() {
         @keyframes scroll-line{0%{transform:translateY(-100%)}50%{transform:translateY(0)}100%{transform:translateY(100%)}}
       `}</style>
 
+      {/* Canvas con el efecto de flujo de datos */}
       <canvas ref={canvasRef} style={{position:'absolute',inset:0,pointerEvents:'none'}} />
 
+      {/* Grid de fondo sutil */}
       <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',opacity:0.02,pointerEvents:'none'}}>
         <defs><pattern id="vg" width="60" height="60" patternUnits="userSpaceOnUse">
           <path d="M60 0L0 0 0 60" fill="none" stroke="white" strokeWidth="0.5"/>
@@ -106,20 +163,17 @@ export default function Hero() {
         <rect width="100%" height="100%" fill="url(#vg)"/>
       </svg>
 
+      {/* Luces de ambiente (Glow) */}
       <div style={{position:'absolute',top:'40%',left:'50%',width:700,height:500,
         background:'radial-gradient(ellipse,rgba(0,210,150,0.08) 0%,transparent 70%)',
         transform:'translate(-50%,-50%)',pointerEvents:'none'}}/>
-      <div style={{position:'absolute',top:'65%',right:'8%',width:400,height:400,
-        background:'radial-gradient(ellipse,rgba(99,102,241,0.06) 0%,transparent 70%)',
-        pointerEvents:'none'}}/>
 
-      {/* Todo el contenido en flujo normal — sin posición absoluta */}
       <div style={{
         maxWidth:860, padding:'60px 40px 80px',
         textAlign:'center', position:'relative', zIndex:10,
-        display:'flex', flexDirection:'column', alignItems:'center', gap:0,
+        display:'flex', flexDirection:'column', alignItems:'center',
       }}>
-        {/* Badge — inline en el flujo */}
+        {/* Badge */}
         <div style={{
           display:'inline-flex', alignItems:'center', gap:8,
           padding:'6px 16px', border:'1px solid rgba(0,210,150,0.2)',
@@ -135,7 +189,7 @@ export default function Hero() {
           </span>
         </div>
 
-        {/* Tag */}
+        {/* Tagline */}
         <div style={{
           fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase',
           color:'rgba(0,210,150,0.4)', marginBottom:20,
@@ -146,7 +200,6 @@ export default function Hero() {
           Desarrollo web · Automatización · IA
         </div>
 
-        {/* H1 */}
         <h1 style={{
           fontFamily:"'Space Grotesk', sans-serif",
           fontSize:'clamp(38px,6.5vw,78px)', fontWeight:700,
@@ -155,12 +208,9 @@ export default function Hero() {
           transform: visible ? 'none' : 'translateY(24px)',
           transition:'all 0.8s cubic-bezier(0.16,1,0.3,1) 0.4s',
         }}>
-          Tu negocio,{' '}
-          <span style={{color:'#00d296'}}>potenciado</span>{' '}
-          con tecnología
+          Tu negocio, <span style={{color:'#00d296'}}>potenciado</span> con tecnología
         </h1>
 
-        {/* Desc */}
         <p style={{
           fontSize:'clamp(15px,1.7vw,17px)', color:'rgba(176,190,220,0.6)',
           lineHeight:1.8, fontWeight:300, maxWidth:560, marginBottom:40,
@@ -168,11 +218,10 @@ export default function Hero() {
           transform: visible ? 'none' : 'translateY(16px)',
           transition:'all 0.8s ease 0.55s',
         }}>
-          Páginas web que convierten, tiendas online que venden y automatizaciones
-          que te ahorran tiempo. Todo hecho a medida para emprendedores y negocios.
+          Páginas web que convierten, tiendas online que venden y automatizaciones que te ahorran tiempo.
         </p>
 
-        {/* CTAs */}
+        {/* Acciones */}
         <div style={{
           display:'flex', gap:16, justifyContent:'center', flexWrap:'wrap',
           marginBottom:72,
@@ -180,20 +229,15 @@ export default function Hero() {
           transform: visible ? 'none' : 'translateY(12px)',
           transition:'all 0.8s ease 0.7s',
         }}>
-          <a
-            href="https://wa.me/5491145311047?text=Hola!%20Quiero%20consultar%20por%20mi%20sitio%20web"
-            target="_blank" rel="noopener noreferrer"
-            className="vmg-btn-p"
-          >
+          <a href="https://wa.me/5491145311047" target="_blank" rel="noopener noreferrer" className="vmg-btn-p">
             <span>Quiero mi sitio web →</span>
           </a>
-          <a href="#servicios" className="vmg-btn-g"
-            onClick={e=>{ e.preventDefault(); document.getElementById('servicios')?.scrollIntoView({behavior:'smooth'}); }}>
+          <a href="#servicios" className="vmg-btn-g">
             Ver servicios
           </a>
         </div>
 
-        {/* Stats */}
+        {/* Estadísticas */}
         <div style={{
           display:'flex', gap:48, justifyContent:'center', flexWrap:'wrap',
           paddingTop:40, borderTop:'1px solid rgba(255,255,255,0.05)',
