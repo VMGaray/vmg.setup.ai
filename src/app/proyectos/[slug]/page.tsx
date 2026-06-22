@@ -1,4 +1,5 @@
 import Martins from "@/components/projects/Martins";
+import Calamuchita from "@/components/projects/Calamuchita";
 
 interface Props {
   params: Promise<{
@@ -12,7 +13,8 @@ export default async function ProjectPage({ params }: Props) {
   switch (slug) {
     case "martins":
       return <Martins />;
-
+    case "calamuchita":
+      return <Calamuchita />;
     default:
       return (
         <div className="min-h-screen flex items-center justify-center">

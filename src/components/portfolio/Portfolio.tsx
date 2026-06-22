@@ -102,9 +102,9 @@ export default function Portfolio() {
           {featured.map((p, i) => (
             <Link
               key={p.slug}
-              href={p.slug === 'martins' ? '/proyectos/martins' : (p.link || '#')}
-              target={p.slug === 'martins' ? undefined : '_blank'}
-              rel={p.slug === 'martins' ? undefined : 'noopener noreferrer'}
+              href={p.link || (['martins','calamuchita'].includes(p.slug) ? `/proyectos/${p.slug}` : '#')}
+              target={p.link ? '_blank' : undefined}
+              rel={p.link ? 'noopener noreferrer' : undefined}
               className="proj-featured vmg-reveal"
               style={{
                 '--acc': p.accent + '12',
@@ -152,7 +152,7 @@ export default function Portfolio() {
 
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                 <span style={{ fontSize:11, letterSpacing:'0.1em', textTransform:'uppercase', color:p.accent, opacity:0.7 }}>
-                  {p.slug === 'martins' ? 'Ver caso de estudio' : 'Ver proyecto'}
+                  Ver proyecto
                 </span>
                 <svg className="proj-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M7 17L17 7M7 7h10v10"/>
