@@ -1,34 +1,23 @@
 'use client';
 
 import Link from "next/link";
+import { projects } from "@/components/portfolio/projects.data";
 
-const PROJECTS = [
-  {
-    slug: "martins",
-    category: "Web · PWA · Automatización",
-    title: "Martins Perforaciones",
-    description: "Sistema de presupuestos inteligente. Generá y enviá por email desde el celular en segundos, con panel de admin y métricas.",
-    accent: "#00d296",
-  },
-  {
-    slug: "ecommerce",
-    category: "E-commerce · Full Stack",
-    title: "E-commerce de Cuero",
-    description: "Magnolia Joyas y Fernanda Saladino — dos tiendas artesanales con auth, carrito, panel admin y gestión de pedidos.",
-    accent: "#6366f1",
-    href: "https://fernanda-saladino.vercel.app/",
-    external: true,
-  },
-  {
-    slug: "heroes",
-    category: "Plataforma · Full Stack",
-    title: "Héroes Cercanos",
-    description: "Plataforma solidaria para bomberos voluntarios con mapa, donaciones, chatbot y panel administrativo.",
-    accent: "#f59e0b",
-    href: "https://heroes-cercanos-front.onrender.com/",
-    external: true,
-  },
-];
+// Slugs con página de caso de estudio propia en /proyectos/[slug]
+const CASE_STUDIES = ["martins", "calamuchita"];
+
+const PROJECTS = projects.map((p) => {
+  const hasCaseStudy = CASE_STUDIES.includes(p.slug);
+  return {
+    slug: p.slug,
+    category: p.category,
+    title: p.title,
+    description: p.description,
+    accent: p.accent,
+    href: hasCaseStudy ? `/proyectos/${p.slug}` : p.link,
+    external: !hasCaseStudy,
+  };
+});
 
 export default function ProyectosPage() {
   return (
@@ -86,8 +75,8 @@ export default function ProyectosPage() {
         {/* Grid */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:16 }}>
           {PROJECTS.map((p, i) => {
-            const isExternal = (p as any).external;
-            const href = isExternal ? (p as any).href : `/proyectos/${p.slug}`;
+            const isExternal = p.external;
+            const href = p.href ?? '#';
             return (
               <Link
                 key={p.slug}
