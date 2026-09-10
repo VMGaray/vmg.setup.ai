@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import Link from 'next/link';
 
 const SERVICES = [
   {
@@ -29,7 +28,7 @@ const SERVICES = [
     description: 'Sistemas de turnos, presupuestos por WhatsApp, paneles de administración, flujos con IA. Lo que necesites para ahorrar tiempo.',
     accent: '#f59e0b',
     features: ['Flujos con n8n', 'Integración IA', 'WhatsApp API', 'Dashboards custom'],
-    href: '/proyectos/martins',
+    href: null,
   },
 ];
 
@@ -77,7 +76,6 @@ export default function Services() {
           cursor: default;
           height: 100%;
         }
-        a.svc-card-wrapper .svc-card { cursor: pointer; }
         .svc-card-wrapper:hover .svc-card { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); }
         .svc-card::before {
           content: ''; position: absolute; inset: 0;
@@ -92,18 +90,6 @@ export default function Services() {
           display: inline-block; transition: all 0.3s;
         }
         .svc-card:hover .svc-feat { color: rgba(176,190,220,0.6); border-color: rgba(255,255,255,0.12); }
-        .svc-cta {
-          font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-          padding: 11px 20px; border-radius: 3px; text-decoration: none;
-          display: inline-flex; align-items: center; gap: 8px;
-          transition: background 0.3s, color 0.3s, border-color 0.3s;
-          margin-top: 28px; font-weight: 500;
-          border: 1px solid var(--acc-solid, #00d296);
-          color: var(--acc-solid, #00d296);
-        }
-        .svc-card-wrapper:hover .svc-cta { background: var(--acc-solid, #00d296); color: #0d1425; }
-        .svc-cta svg { transition: transform 0.3s; }
-        .svc-card-wrapper:hover .svc-cta svg { transform: translate(2px,-2px); }
       `}</style>
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 40px' }}>
@@ -128,7 +114,6 @@ export default function Services() {
                 onMouseMove={handleMouseMove}
                 style={{
                   '--acc': s.accent + '10',
-                  '--acc-solid': s.accent,
                   transitionDelay: `${i * 0.12}s`,
                 } as React.CSSProperties}
               >
@@ -160,25 +145,10 @@ export default function Services() {
                     <span key={f} className="svc-feat">{f}</span>
                   ))}
                 </div>
-
-                {s.href && (
-                  <div>
-                    <span className="svc-cta">
-                      Ver ejemplo real
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M7 17L17 7M7 7h10v10" />
-                      </svg>
-                    </span>
-                  </div>
-                )}
               </div>
             );
 
-            return s.href ? (
-              <Link key={s.num} href={s.href} className="svc-card-wrapper">
-                {cardContent}
-              </Link>
-            ) : (
+            return (
               <div key={s.num} className="svc-card-wrapper">
                 {cardContent}
               </div>

@@ -42,8 +42,16 @@ export default function ProyectosPage() {
         }
         .proy-card:hover { border-color:rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); transform:translateY(-2px); }
         .proy-card:hover::before { opacity:1; }
-        .proy-arrow { opacity:0; transform:translateX(-6px); transition:all 0.3s; }
-        .proy-card:hover .proy-arrow { opacity:1; transform:translateX(0); }
+        .proy-cta {
+          display:inline-flex; align-items:center; gap:8px;
+          font-size:11px; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;
+          padding:10px 18px; border-radius:3px;
+          border:1px solid var(--acc-solid,#00d296); color:var(--acc-solid,#00d296);
+          transition:background 0.3s, color 0.3s;
+        }
+        .proy-card:hover .proy-cta { background:var(--acc-solid,#00d296); color:#0d1425; }
+        .proy-cta svg { transition:transform 0.3s; }
+        .proy-card:hover .proy-cta svg { transform:translate(2px,-2px); }
       `}</style>
 
       <div style={{ maxWidth:1100, margin:'0 auto', padding:'80px 40px 120px' }}>
@@ -84,7 +92,7 @@ export default function ProyectosPage() {
                 target={isExternal ? '_blank' : undefined}
                 rel={isExternal ? 'noopener noreferrer' : undefined}
                 className="proy-card"
-                style={{ '--acc': p.accent + '12' } as React.CSSProperties}
+                style={{ '--acc': p.accent + '12', '--acc-solid': p.accent } as React.CSSProperties}
                 onMouseMove={(e) => {
                   const r = e.currentTarget.getBoundingClientRect();
                   e.currentTarget.style.setProperty('--cx', `${((e.clientX-r.left)/r.width)*100}%`);
@@ -111,14 +119,12 @@ export default function ProyectosPage() {
                 <p style={{ fontSize:13, color:'rgba(176,190,220,0.5)', lineHeight:1.75, fontWeight:300, marginBottom:24 }}>
                   {p.description}
                 </p>
-                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                  <span style={{ fontSize:11, letterSpacing:'0.1em', textTransform:'uppercase', color:p.accent, opacity:0.7 }}>
-                    {isExternal ? 'Ver proyecto' : 'Ver caso de estudio'}
-                  </span>
-                  <svg className="proy-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={p.accent} strokeWidth="2">
+                <span className="proy-cta">
+                  {isExternal ? 'Ver proyecto' : 'Ver caso de estudio'}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M7 17L17 7M7 7h10v10"/>
                   </svg>
-                </div>
+                </span>
               </Link>
             );
           })}

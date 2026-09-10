@@ -65,13 +65,18 @@ export default function Portfolio() {
         .proj-featured:hover .proj-tag, .proj-small:hover .proj-tag {
           border-color:rgba(255,255,255,0.12); color:rgba(176,190,220,0.6);
         }
-        .proj-arrow {
-          opacity:0; transform:translateX(-6px); transition:all 0.3s;
-          color:rgba(176,190,220,0.3);
+        .proj-cta {
+          display:inline-flex; align-items:center; gap:8px;
+          font-size:11px; letter-spacing:0.1em; text-transform:uppercase; font-weight:500;
+          padding:10px 18px; border-radius:3px;
+          border:1px solid var(--acc-solid,#00d296); color:var(--acc-solid,#00d296);
+          transition:background 0.3s, color 0.3s;
         }
-        .proj-featured:hover .proj-arrow, .proj-small:hover .proj-arrow {
-          opacity:1; transform:translateX(0);
+        .proj-featured:hover .proj-cta, .proj-small:hover .proj-cta {
+          background:var(--acc-solid,#00d296); color:#0d1425;
         }
+        .proj-cta svg { transition:transform 0.3s; }
+        .proj-featured:hover .proj-cta svg, .proj-small:hover .proj-cta svg { transform:translate(2px,-2px); }
       `}</style>
 
       <div style={{
@@ -108,6 +113,7 @@ export default function Portfolio() {
               className="proj-featured vmg-reveal"
               style={{
                 '--acc': p.accent + '12',
+                '--acc-solid': p.accent,
                 transitionDelay: `${i * 0.1}s`,
               } as React.CSSProperties}
               onMouseMove={(e) => {
@@ -150,14 +156,12 @@ export default function Portfolio() {
                 {p.tech.map(t => <span key={t} className="proj-tag">{t}</span>)}
               </div>
 
-              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <span style={{ fontSize:11, letterSpacing:'0.1em', textTransform:'uppercase', color:p.accent, opacity:0.7 }}>
-                  Ver proyecto
-                </span>
-                <svg className="proj-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <span className="proj-cta">
+                Ver proyecto
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M7 17L17 7M7 7h10v10"/>
                 </svg>
-              </div>
+              </span>
             </Link>
           ))}
         </div>
@@ -171,7 +175,10 @@ export default function Portfolio() {
                 href={p.link || '#'}
                 target="_blank" rel="noopener noreferrer"
                 className="proj-small vmg-reveal"
-                style={{ transitionDelay:`${(featured.length + i)*0.08}s` }}
+                style={{
+                  '--acc-solid': p.accent,
+                  transitionDelay:`${(featured.length + i)*0.08}s`,
+                } as React.CSSProperties}
               >
                 <div style={{ width:20, height:2, background:p.accent, marginBottom:16, borderRadius:1 }}/>
                 <div style={{ fontSize:10, letterSpacing:'0.15em', textTransform:'uppercase', color:p.accent, opacity:0.6, marginBottom:8 }}>
@@ -189,14 +196,12 @@ export default function Portfolio() {
                 <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:16 }}>
                   {p.tech.map(t => <span key={t} className="proj-tag">{t}</span>)}
                 </div>
-                <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                  <span style={{ fontSize:10, letterSpacing:'0.1em', textTransform:'uppercase', color:p.accent, opacity:0.6 }}>
-                    Ver proyecto
-                  </span>
-                  <svg className="proj-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <span className="proj-cta">
+                  Ver proyecto
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M7 17L17 7M7 7h10v10"/>
                   </svg>
-                </div>
+                </span>
               </a>
             ))}
           </div>
