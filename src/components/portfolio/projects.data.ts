@@ -89,5 +89,6 @@ export const projects: Project[] = [
     tech: ['n8n', 'TypeScript', 'OpenAI API', 'Node.js', 'REST APIs'],
     accent: '#e879f9',
     link: 'https://impacto-notas-prensa.vercel.app/',
+    featured: true,
   },
 ];
