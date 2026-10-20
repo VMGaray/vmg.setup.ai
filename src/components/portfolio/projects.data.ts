@@ -7,6 +7,8 @@ export interface Project {
   accent: string;
   link?: string;
   github?: string;
+  // Proyectos sin web pública: la tarjeta no es link y el CTA abre WhatsApp
+  demoWhatsapp?: string;
   featured?: boolean;
 }
 
@@ -89,6 +91,16 @@ export const projects: Project[] = [
     tech: ['n8n', 'TypeScript', 'OpenAI API', 'Node.js', 'REST APIs'],
     accent: '#e879f9',
     link: 'https://impacto-notas-prensa.vercel.app/',
+    featured: true,
+  },
+  {
+    slug: 'timbre-qr',
+    category: 'IoT · Automatización · Full Stack',
+    title: 'Timbre Inteligente QR',
+    description: 'Timbre sin cables ni instalación eléctrica: un QR en la puerta y el aviso llega al instante al celular de toda la familia por Telegram. Responden con un toque y el visitante ve la respuesta en pantalla. Incluye anti-spam, avisos entre la familia y una web animada pensada para el celular. El primer paso hacia una casa inteligente.',
+    tech: ['Next.js', 'TypeScript', 'Supabase', 'Telegram Bot', 'Tailwind', 'Vercel'],
+    accent: '#fb7185',
+    demoWhatsapp: 'https://wa.me/5491145311047?text=Hola!%20Vi%20el%20Timbre%20Inteligente%20QR%20en%20tu%20web%20y%20quiero%20consultar',
     featured: true,
   },
 ];

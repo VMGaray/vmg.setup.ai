@@ -103,25 +103,22 @@ export default function Portfolio() {
         </div>
 
         {/* Featured grid — 2 columnas primero, luego full */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:16, marginBottom:16 }}>
-          {featured.map((p, i) => (
-            <Link
-              key={p.slug}
-              href={p.link || (['martins','calamuchita'].includes(p.slug) ? `/proyectos/${p.slug}` : '#')}
-              target={p.link ? '_blank' : undefined}
-              rel={p.link ? 'noopener noreferrer' : undefined}
-              className="proj-featured vmg-reveal"
-              style={{
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(300px,100%),1fr))', gap:16, marginBottom:16 }}>
+          {featured.map((p, i) => {
+            const cardProps = {
+              className: 'proj-featured vmg-reveal',
+              style: {
                 '--acc': p.accent + '12',
                 '--acc-solid': p.accent,
                 transitionDelay: `${i * 0.1}s`,
-              } as React.CSSProperties}
-              onMouseMove={(e) => {
+              } as React.CSSProperties,
+              onMouseMove: (e: React.MouseEvent<HTMLElement>) => {
                 const r = e.currentTarget.getBoundingClientRect();
                 e.currentTarget.style.setProperty('--cx', `${((e.clientX-r.left)/r.width)*100}%`);
                 e.currentTarget.style.setProperty('--cy', `${((e.clientY-r.top)/r.height)*100}%`);
-              }}
-            >
+              },
+            };
+            const content = (<>
               {/* Accent line */}
               <div style={{ width:28, height:2, background:p.accent, marginBottom:24, borderRadius:1 }}/>
 
@@ -156,19 +153,43 @@ export default function Portfolio() {
                 {p.tech.map(t => <span key={t} className="proj-tag">{t}</span>)}
               </div>
 
-              <span className="proj-cta">
-                Ver proyecto
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M7 17L17 7M7 7h10v10"/>
-                </svg>
-              </span>
-            </Link>
-          ))}
+              {p.demoWhatsapp ? (
+                <a href={p.demoWhatsapp} target="_blank" rel="noopener noreferrer" className="proj-cta" style={{ textDecoration:'none' }}>
+                  Consultá por una demo
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M7 17L17 7M7 7h10v10"/>
+                  </svg>
+                </a>
+              ) : (
+                <span className="proj-cta">
+                  Ver proyecto
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M7 17L17 7M7 7h10v10"/>
+                  </svg>
+                </span>
+              )}
+            </>);
+
+            // Sin web pública: la tarjeta no es link, solo el CTA de WhatsApp
+            if (p.demoWhatsapp) return <div key={p.slug} {...cardProps}>{content}</div>;
+
+            return (
+              <Link
+                key={p.slug}
+                href={p.link || (['martins','calamuchita'].includes(p.slug) ? `/proyectos/${p.slug}` : '#')}
+                target={p.link ? '_blank' : undefined}
+                rel={p.link ? 'noopener noreferrer' : undefined}
+                {...cardProps}
+              >
+                {content}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Rest — más pequeños */}
         {rest.length > 0 && (
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))', gap:16 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(260px,100%),1fr))', gap:16 }}>
             {rest.map((p, i) => (
               <a
                 key={p.slug}
